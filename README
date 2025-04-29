@@ -1,0 +1,48 @@
+estructura:
+/Backend/
+│
+├── /app/
+│   ├── main.py
+│   ├── /services/
+│        ├── findPosts.py
+│        └── sortTitles.py
+│   ├── /models/
+│   │    └── model_output/
+│
+├── /data/
+│   ├── CSVfile/
+│   ├── CSVfilefiltered/
+│   ├── CSVsTraining/
+│   ├── ResultadosFiltered/
+│   ├── ResultadosLabeled/
+│   └── titles_dataset_expanded_pipe.txt
+│
+├── /scripts/
+│   ├── EntrenarModelo.py
+│   ├── printUniqueTitles.py
+│   ├── ProvarModelo.py
+│   └── sortTitles_training.py
+│
+├── config.init
+└── README.md
+
+
+
+Entrenar el modelo PASOS:
+1. Ejecutar de la carpeta ExtractPosts algun main (4 recomendado)
+2. Ejecutar ProvarModelo.py
+
+
+
+Interests files:
+SCRAPPING/main/..
+
+SCRAPPING/model_output/..
+
+SCRAPPING/entrenarModelo.py
+
+SCRAPPING/ProvarModelo.py
+
+SCRAPPING/CSVsTraining/
+
+SCRAPPING/ResultadosLabeled

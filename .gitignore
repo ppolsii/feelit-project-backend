@@ -1,0 +1,25 @@
+# Ignorar outputs de modelos entrenados
+/app/models/model_output/
+
+# Ignorar datos grandes
+/data/CSVfile/
+/data/CSVfilefiltered/
+/data/CSVsTraining/
+/data/ResultadosFiltered/
+/data/ResultadosLabeled/
+
+# Otros archivos comunes
+*.log
+*.csv
+*.pkl
+*.h5
+
+# VSCode
+.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Config
+.env

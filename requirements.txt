@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+praw
+pandas
+torch
+transformers
+python-dotenv
+datasets
+scikit-learn
