@@ -2,6 +2,7 @@ import csv
 import praw
 import os
 import datetime as dt
+from pathlib import Path
 
 # ==== 1️⃣ Definim la funció que inicialitza Reddit i fa la cerca ====
 
@@ -22,8 +23,10 @@ def search_reddit_praw(keyword):
         user_agent=user_agent
     )
 
-    # Ruta del directori principal
-    main_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # ✅ Ruta base del projecte
+    main_dir = Path(__file__).resolve().parents[2]  # Pujar 2 nivells
+
+    # Carpeta per guardar els .csv
     folder = os.path.join(main_dir, 'data', 'CSVfile')
 
     # Nom del fitxer de sortida
