@@ -5,6 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.services.findPosts import search_reddit_praw
 from app.services.sortTitles import filter_titles
 
+from dotenv import load_dotenv
+
+# ✅ Carreguem el .env al començar
+load_dotenv()
+
 # ✅ Creem l'aplicació FastAPI
 app = FastAPI()
 

@@ -32,6 +32,14 @@ Entrenar el modelo PASOS:
 1. Ejecutar de la carpeta ExtractPosts algun main (4 recomendado)
 2. Ejecutar ProvarModelo.py
 
+Crear ven:
+python -m venv venv       
+
+1- Activar ven:
+.\venv\Scripts\actívate
+
+2- Obrir escolta port 8000:
+uvicorn app.main:app --reload --port 8000
 
 
 Interests files:

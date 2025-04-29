@@ -17,6 +17,10 @@
 # VSCode
 .vscode/
 
+#__pycache__/
+app/__pycache__/
+app/services/__pycache__/
+
 # Sistema
 .DS_Store
 Thumbs.db
