@@ -2,12 +2,25 @@ import csv
 import praw
 import os
 import datetime as dt
+from dotenv import load_dotenv
 
-# ==== 1️⃣ Reddit API Credentials ====
+# ==== 1️⃣ Cargar variables de entorno ====
+
+# Calcular la ruta al .env (dos carpetas arriba de este script)
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+load_dotenv(dotenv_path=env_path)
+
+# Leer las variables del .env
+client_id = os.getenv('CLIENT_ID')
+client_secret = os.getenv('CLIENT_SECRET')
+user_agent = os.getenv('USER_AGENT')
+
+
+# ==== 2️⃣ Inicializar Reddit API ====
 reddit = praw.Reddit(
-    client_id='0SDRnVSYWOWfclm6t0IjCg',
-    client_secret='-z0zn4zY1Q_-xJQxYXOvRJOES5tawQ',
-    user_agent='python:OpinionExtractor:1.0 (by /u/Agitated-Border-7224)'
+    client_id=client_id,
+    client_secret=client_secret,
+    user_agent=user_agent
 )
 
 def search_reddit_praw(keyword):
