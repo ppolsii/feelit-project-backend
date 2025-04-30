@@ -52,6 +52,7 @@ def search_reddit_praw(keyword):
         subreddit = reddit.subreddit('all')
 
         num = 1
+        # Search up to 100 Reddit posts matching the keyword, sorted by relevance
         for submission in subreddit.search(keyword, sort='relevance', limit=100):
             # Only include posts that actually contain the keyword and have comments
             if keyword.lower() not in submission.title.lower():
