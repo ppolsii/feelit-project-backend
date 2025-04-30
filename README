@@ -45,7 +45,7 @@ It uses FastAPI, PRAW (Reddit API), and a fine-tuned DistilBERT model to extract
 
 ---
 
- ## How It Works
+ ## 🧠 How It Works
 
 1. A user sends a search keyword to the FastAPI backend.
 
@@ -105,7 +105,7 @@ To train and test the classifier:
 
 ---
 
-## Requirements
+## 📦 Requirements
 
 All required packages are listed in requirements.txt.
 
