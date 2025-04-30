@@ -1,10 +1,18 @@
-Reddit Opinion Extractor — Backend
-===================
+# 🧠 FeelIt - Opinion Analysis on Reddit
+
+**FeelIt** is a web application developed as a Final Degree Project to analyze opinions on any topic collected from Reddit, presenting a summarized and clear view through sentiment analysis and highlighted comments.
+
+---
+
+## Reddit Opinion Extractor — Backend
+
 This is the backend service for a Reddit opinion analysis app.
 It uses FastAPI, PRAW (Reddit API), and a fine-tuned DistilBERT model to extract, filter and classify Reddit comments based on a user-provided keyword.
 
- Project Structure
--------------------
+---
+
+## 🧱 Project Structure
+
 /Backend/
 │
 ├── app/
@@ -35,10 +43,10 @@ It uses FastAPI, PRAW (Reddit API), and a fine-tuned DistilBERT model to extract
 ├── requirements.txt             ← Python dependencies
 └── README.md
 
-===================
+---
 
- How It Works
--------------------
+ ## How It Works
+
 1. A user sends a search keyword to the FastAPI backend.
 
 2. The /api/search route triggers:
@@ -47,43 +55,43 @@ It uses FastAPI, PRAW (Reddit API), and a fine-tuned DistilBERT model to extract
 
 3. The filtered CSV can then be used for further sentiment analysis or visualization.
 
-===================
+---
 
-How to Run (Local Development)
--------------------
-1. Clone the project and create a virtual environment
+## How to Run (Local Development)
+
+**1. Clone the project and create a virtual environment**
 "python -m venv venv"
 
-2. Activate the virtual environment
+**2. Activate the virtual environment**
 # Windows
 ".\venv\Scripts\activate"
 
-3. Install dependencies
+**3. Install dependencies**
 "pip install -r requirements.txt"
 
-4. Set up .env file with Reddit API credentials
+**4. Set up .env file with Reddit API credentials**
 REDDIT_CLIENT_ID=your_id
 REDDIT_CLIENT_SECRET=your_secret
 REDDIT_USER_AGENT=your_user_agent
 
-5. Run the FastAPI server
+**5. Run the FastAPI server**
 "uvicorn app.main:app --reload --port 8000"
 
 
-Backend will now be accessible at:
-http://localhost:8000/api/search?keyword=example
+**Backend will now be accessible at:**
+`http://localhost:8000/api/search?keyword=example`
 
-===================
+---
 
-Model Training & Testing
--------------------
+## Model Training & Testing
+
 1. Train the DistilBERT model using the training data (sortTitles_training.py).
 2. Test the model using the test data (ProvarModelo.py).
 
 ===================
 
-Data Visualization
--------------------
+## Data Visualization
+
 To train and test the classifier:
 
 1. Extract titles from labeled data:
@@ -95,8 +103,17 @@ To train and test the classifier:
 3. Evaluate or test it:
 "python scripts/ProvarModelo.py"
 
-===================
+---
 
-Requirements
--------------------
+## Requirements
+
 All required packages are listed in requirements.txt.
+
+---
+
+## ✨ Developed by
+
+**Pol González Casals**  
+Universitat Autònoma de Barcelona (2025)  
+[LinkedIn](https://www.linkedin.com/in/pol-gonzalez-casals) · [GitHub](https://github.com/ppolsii)
+
