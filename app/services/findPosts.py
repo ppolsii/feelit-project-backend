@@ -13,7 +13,7 @@ def search_reddit_praw(keyword):
 
     #  Debug check: ensure all credentials are present
     if not client_id or not client_secret or not user_agent:
-        raise RuntimeError("❌ Missing environment variables: REDDIT_CLIENT_ID, etc... - not found. Please check your environment!")
+        raise RuntimeError("❌ Missing reddit token variables ( REDDIT_CLIENT_ID, ...) - not found. Please check your environment!")
 
     # Initialize Reddit API client
     reddit = praw.Reddit(
