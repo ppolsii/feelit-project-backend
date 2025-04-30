@@ -4,37 +4,41 @@ import pandas as pd
 from pathlib import Path
 import os
 
-# 1) Obtener la ruta absoluta de la carpeta donde está este script
+# Step 1: Define directory where this script is located
 this_dir = Path(__file__).resolve().parent
 
-# 2) Construir la ruta absoluta del modelo
+# Step 2: Build full path to the saved model directory
 model_path = (this_dir.parent / "models" / "model_output").resolve()
 
-# ✅ Carga del modelo y tokenizer desde carpeta local
+# Step 3: Load pre-trained model and tokenizer from local directory
 model = DistilBertForSequenceClassification.from_pretrained(
     model_path, local_files_only=True
 )
 tokenizer = DistilBertTokenizerFast.from_pretrained(
     'distilbert-base-uncased', local_files_only=True
 )
-model.eval()
 
-# 🔥 Funció que reemplaça sys.argv
+# Step 4: Set the model to evaluation mode (for prediction only).
+# This disables things like dropout and ensures consistent results.
+model.eval() 
+
+# Function to classify and filter titles from a CSV file
 def filter_titles(csv_path: str):
     """
-    Filtra un CSV donat, aplicant el model DistilBERT per seleccionar només els títols rellevants.
-    Sobreescriu el CSV original amb els títols filtrats.
+    Filters a CSV file by classifying post titles using DistilBERT,
+    and keeps only the ones predicted as relevant (label 1).
+    Overwrites the original CSV with the filtered results.
     """
     input_csv = Path(csv_path).resolve()
     print("sortTitles_service.py → input_csv:", input_csv)
 
-    # Leer CSV
+    # Read the original CSV
     df_full = pd.read_csv(input_csv)
 
-    # Eliminar duplicats només per a classificació
+    # Remove duplicate titles before classification
     unique_titles = df_full[['Post Title']].drop_duplicates()
 
-    # Aplicar model als títols
+    # Apply the model to each title and store predictions
     predictions = []
     for title in unique_titles['Post Title']:
         inputs = tokenizer(title, return_tensors="pt", truncation=True, padding=True)
@@ -44,13 +48,13 @@ def filter_titles(csv_path: str):
             pred = torch.argmax(probs, dim=1).item()
             predictions.append(pred)
 
-    # Afegir columna de predicció
+    # Add predictions as a new column
     unique_titles['Predicted Label'] = predictions
 
-    # Filtrar títols interessants (label = 1)
+    # Keep only titles classified as relevant (label == 1)
     interesting_titles = unique_titles[unique_titles['Predicted Label'] == 1]['Post Title']
     df_filtered = df_full[df_full['Post Title'].isin(interesting_titles)]
 
-    # Sobreescriure el CSV original amb el resultat final
+    # Overwrite the original CSV with filtered results
     df_filtered.to_csv(input_csv, index=False)
-    print(f"\n✅ S'ha sobrescrit el CSV amb {len(df_filtered)} entrades: {input_csv}")
+    print(f"\n✅ Overwritten CSV with {len(df_filtered)} entries: {input_csv}")

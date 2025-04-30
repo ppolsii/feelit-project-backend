@@ -7,24 +7,27 @@ from app.services.sortTitles import filter_titles
 
 from dotenv import load_dotenv
 
-# ✅ Carreguem el .env al començar
+# Load environment variables from .env file
 load_dotenv()
 
-# ✅ Creem l'aplicació FastAPI
+# ✅ Create FastAPI app
 app = FastAPI()
 
-# ✅ Configuració de CORS per permetre connexions des de localhost:5173
+# ✅ Enable CORS to allow frontend (e.g. React on localhost:5173) to call the backend API from the frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # o "*" si vols permetre-ho tot en desenvolupament
+    allow_origins=["http://localhost:5173"],  # Use "*" to allow any origin (for development only)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ Definim la ruta /api/search
+# ✅ Define GET route /api/search to handle Reddit search and title filtering
 @app.get("/api/search")
 def search_and_filter(keyword: str):
+    # Step 1: Search Reddit and save results to CSV
     csv_name = search_reddit_praw(keyword)
+
+     # Step 2: Filter titles using a pre-trained model
     filter_titles(csv_name)
     return {"message": f"🔎 Cerca completada per '{keyword}'. Resultat: {csv_name}"}

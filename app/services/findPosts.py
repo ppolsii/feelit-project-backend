@@ -4,38 +4,38 @@ import os
 import datetime as dt
 from pathlib import Path
 
-# ==== 1️⃣ Definim la funció que inicialitza Reddit i fa la cerca ====
-
+# ==== <-- 1 --> Main function to search Reddit and save data to a CSV ====
 def search_reddit_praw(keyword):
-    # 🔐 Carreguem variables dins la funció (ja tenim .env carregat des de main.py)
+    # Load Reddit API credentials from .env (already loaded in main.py)
     client_id = os.getenv('REDDIT_CLIENT_ID')
     client_secret = os.getenv('REDDIT_CLIENT_SECRET')
     user_agent = os.getenv('REDDIT_USER_AGENT')
 
-    # ❗ Verificació opcional per depuració
+    #  Debug check: ensure all credentials are present
     if not client_id or not client_secret or not user_agent:
-        raise RuntimeError("❌ Alguna variable d'entorn (REDDIT_CLIENT_ID, ...) no s'ha carregat!")
+        raise RuntimeError("❌ Missing environment variables: REDDIT_CLIENT_ID, etc... - not found. Please check your environment!")
 
-    # Inicialitzar Reddit API
+    # Initialize Reddit API client
     reddit = praw.Reddit(
         client_id=client_id,
         client_secret=client_secret,
         user_agent=user_agent
     )
 
-    # ✅ Ruta base del projecte
-    main_dir = Path(__file__).resolve().parents[2]  # Pujar 2 nivells
+    # Define project root path (2 levels up from this file)
+    main_dir = Path(__file__).resolve().parents[2]  # Two levels up from this file
 
-    # Carpeta per guardar els .csv
+    # Folder to store generated CSVs (.csv)
     folder = os.path.join(main_dir, 'data', 'CSVfile')
 
-    # Nom del fitxer de sortida
+    # Create sanitized CSV filename using keyword and current date
     sanitized_keyword = keyword.replace(" ", "_")
     date = dt.date.today()
     csv_filename = os.path.join(folder, f'reddit_praw_{sanitized_keyword}_{date}.csv')
 
     os.makedirs(folder, exist_ok=True)
 
+    # Open CSV file for writing
     with open(csv_filename, mode='w', newline='', encoding='utf-8') as csv_file:
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow([
@@ -48,11 +48,12 @@ def search_reddit_praw(keyword):
             'Number of Replies'
         ])
 
-        print(f"\n🔍 Buscant posts sobre: {keyword} (PRAW)\n")
+        print(f"\n🔍 Searching Reddit for: {keyword} (PRAW)\n")
         subreddit = reddit.subreddit('all')
 
         num = 1
         for submission in subreddit.search(keyword, sort='relevance', limit=100):
+            # Only include posts that actually contain the keyword and have comments
             if keyword.lower() not in submission.title.lower():
                 continue
             if submission.num_comments == 0:
@@ -64,6 +65,7 @@ def search_reddit_praw(keyword):
                 comment_score = comment.score
                 num_replies = len(comment.replies)
 
+                # Save comment if it's meaningful (long enough and has upvotes)
                 if len(comment_text) > 30 and comment_score >= 1:
                     csv_writer.writerow([
                         num,
@@ -76,5 +78,5 @@ def search_reddit_praw(keyword):
                     ])
                     num += 1
 
-    print(f"\n✅ Resultats guardats en '{csv_filename}'")
+    print(f"\n✅ Results saved in '{csv_filename}'")
     return csv_filename

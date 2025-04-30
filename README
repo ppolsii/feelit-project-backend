@@ -1,56 +1,102 @@
-estructura:
+Reddit Opinion Extractor — Backend
+===================
+This is the backend service for a Reddit opinion analysis app.
+It uses FastAPI, PRAW (Reddit API), and a fine-tuned DistilBERT model to extract, filter and classify Reddit comments based on a user-provided keyword.
+
+ Project Structure
+-------------------
 /Backend/
 │
-├── /app/
-│   ├── main.py
-│   ├── /services/
-│        ├── findPosts.py
-│        └── sortTitles.py
-│   ├── /models/
-│   │    └── model_output/
+├── app/
+│   ├── main.py                    ← FastAPI entrypoint
+│   └── services/                  ← Core logic
+│        ├── findPosts.py         ← Reddit search and CSV export
+│        └── sortTitles.py        ← Filter titles using DistilBERT
 │
-├── /data/
-│   ├── CSVfile/
-│   ├── CSVfilefiltered/
-│   ├── CSVsTraining/
-│   ├── ResultadosFiltered/
-│   ├── ResultadosLabeled/
+├── models/
+│   └── model_output/             ← Trained DistilBERT model
+│
+├── data/
+│   ├── CSVfile/                  ← Raw Reddit results
+│   ├── CSVfilefiltered/         ← Filtered Reddit results
+│   ├── CSVsTraining/            ← Data used for model training
+│   ├── ResultadosFiltered/      ← Cleaned, classified results
+│   ├── ResultadosLabeled/       ← Labeled datasets
 │   └── titles_dataset_expanded_pipe.txt
 │
-├── /scripts/
-│   ├── EntrenarModelo.py
-│   ├── printUniqueTitles.py
-│   ├── ProvarModelo.py
-│   └── sortTitles_training.py
+├── scripts/
+│   ├── EntrenarModelo.py        ← Train DistilBERT model
+│   ├── ProvarModelo.py          ← Test the trained model
+│   ├── printUniqueTitles.py     ← View unique titles from dataset
+│   └── sortTitles_training.py   ← Filter logic used for training
 │
-├── config.init
+├── .env                         ← Contains Reddit API credentials
+├── config.init                  ← Optional configuration script
+├── requirements.txt             ← Python dependencies
 └── README.md
 
+===================
+
+ How It Works
+-------------------
+1. A user sends a search keyword to the FastAPI backend.
+
+2. The /api/search route triggers:
+    · findPosts.py → searches Reddit and stores comments in a CSV file.
+    · sortTitles.py → uses a trained DistilBERT model to filter relevant posts.
+
+3. The filtered CSV can then be used for further sentiment analysis or visualization.
+
+===================
+
+How to Run (Local Development)
+-------------------
+1. Clone the project and create a virtual environment
+"python -m venv venv"
+
+2. Activate the virtual environment
+# Windows
+".\venv\Scripts\activate"
+
+3. Install dependencies
+"pip install -r requirements.txt"
+
+4. Set up .env file with Reddit API credentials
+REDDIT_CLIENT_ID=your_id
+REDDIT_CLIENT_SECRET=your_secret
+REDDIT_USER_AGENT=your_user_agent
+
+5. Run the FastAPI server
+"uvicorn app.main:app --reload --port 8000"
 
 
-Entrenar el modelo PASOS:
-1. Ejecutar de la carpeta ExtractPosts algun main (4 recomendado)
-2. Ejecutar ProvarModelo.py
+Backend will now be accessible at:
+http://localhost:8000/api/search?keyword=example
 
-Crear ven:
-python -m venv venv       
+===================
 
-1- Activar ven:
-.\venv\Scripts\activate
+Model Training & Testing
+-------------------
+1. Train the DistilBERT model using the training data (sortTitles_training.py).
+2. Test the model using the test data (ProvarModelo.py).
 
-2- Obrir escolta port 8000:
-uvicorn app.main:app --reload --port 8000
+===================
 
+Data Visualization
+-------------------
+To train and test the classifier:
 
-Interests files:
-SCRAPPING/main/..
+1. Extract titles from labeled data:
+"python scripts/printUniqueTitles.py"
 
-SCRAPPING/model_output/..
+2. Train the model:
+"python scripts/EntrenarModelo.py"
 
-SCRAPPING/entrenarModelo.py
+3. Evaluate or test it:
+"python scripts/ProvarModelo.py"
 
-SCRAPPING/ProvarModelo.py
+===================
 
-SCRAPPING/CSVsTraining/
-
-SCRAPPING/ResultadosLabeled
+Requirements
+-------------------
+All required packages are listed in requirements.txt.
