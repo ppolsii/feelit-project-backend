@@ -45,6 +45,22 @@ It uses FastAPI, PRAW (Reddit API), and a fine-tuned DistilBERT model to extract
 
 ---
 
+## Installation
+
+This project requires a pre-trained model (~1.74 GB) to work properly.  
+The model is **not included in this repository** due to its size.
+
+📦 **Download the model here**: [https://drive.google.com/drive/folders/11-DXYhMhrijQPiZU600u68px3JMKUmTb?usp=drive_link]
+
+After downloading, place the model inside the project folder as follows, it should look like this:
+```
+Backend/
+├── models/
+│   └── model_output/             ← Inside this folder, place the downloaded model
+```
+
+---
+
  ## 🧠 How It Works
 
 1. A user sends a search keyword to the FastAPI backend.

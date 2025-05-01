@@ -10,10 +10,10 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# ✅ Create FastAPI app
+# Create FastAPI app
 app = FastAPI()
 
-# ✅ Enable CORS to allow frontend (e.g. React on localhost:5173) to call the backend API from the frontend
+# Enable CORS to allow frontend (e.g. React on localhost:5173) to call the backend API from the frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],  # Use "*" to allow any origin (for development only)
@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Define GET route /api/search to handle Reddit search and title filtering
+# Define GET route /api/search to handle Reddit search and title filtering
 @app.get("/api/search")
 def search_and_filter(keyword: str):
     # Step 1: Search Reddit and save results to CSV
