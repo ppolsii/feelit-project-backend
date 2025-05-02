@@ -17,12 +17,12 @@ It uses FastAPI, PRAW (Reddit API), and a fine-tuned DistilBERT model to extract
 │
 ├── app/
 │   ├── main.py                    ← FastAPI entrypoint
-│   └── services/                  ← Core logic
-│        ├── findPosts.py         ← Reddit search and CSV export
-│        └── sortTitles.py        ← Filter titles using DistilBERT
-│
-├── models/
-│   └── model_output/             ← Trained DistilBERT model
+│   ├── services/                  ← Core logic
+│   │   ├── findPosts.py         ← Reddit search and CSV export
+│   │   └── sortTitles.py        ← Filter titles using DistilBERT
+│   │
+│   └── models/
+│       └── model_output/             ← Trained DistilBERT model
 │
 ├── data/
 │   ├── CSVfile/                  ← Raw Reddit results
@@ -55,8 +55,9 @@ The model is **not included in this repository** due to its size.
 After downloading, place the model inside the project folder as follows, it should look like this:
 ```
 Backend/
-├── models/
-│   └── model_output/             ← Inside this folder, place the downloaded model
+├── app/
+│    └── models/
+│        └── model_output/             ← Inside this folder, place the downloaded model
 ```
 
 ---
