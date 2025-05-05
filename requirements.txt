@@ -7,3 +7,5 @@ transformers
 python-dotenv
 datasets
 scikit-learn
+openai 
+tiktoken 

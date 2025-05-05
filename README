@@ -19,6 +19,7 @@ It uses FastAPI, PRAW (Reddit API), and a fine-tuned DistilBERT model to extract
 │   ├── main.py                    ← FastAPI entrypoint
 │   ├── services/                  ← Core logic
 │   │   ├── findPosts.py         ← Reddit search and CSV export
+│   │   ├── analyzeSentiment.py   ← Sentiment analysis
 │   │   └── sortTitles.py        ← Filter titles using DistilBERT
 │   │
 │   └── models/
@@ -90,6 +91,9 @@ Backend/
 REDDIT_CLIENT_ID=your_id
 REDDIT_CLIENT_SECRET=your_secret
 REDDIT_USER_AGENT=your_user_agent
+
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=the_model_you_want_to_use # e.g., gpt-3.5-turbo
 
 **5. Run the FastAPI server**
 "uvicorn app.main:app --reload --port 8000"
