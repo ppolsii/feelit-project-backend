@@ -4,7 +4,7 @@ import os
 import datetime as dt
 from pathlib import Path
 
-# ==== <-- 1 --> Main function to search Reddit and save data to a CSV ====
+# ==== Main function to search Reddit and save data to a CSV ====
 def search_reddit_praw(keyword):
     # Load Reddit API credentials from .env (already loaded in main.py)
     client_id = os.getenv('REDDIT_CLIENT_ID')

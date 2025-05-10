@@ -7,6 +7,7 @@
 /data/CSVsTraining/
 /data/ResultadosFiltered/
 /data/ResultadosLabeled/
+/data/LotesFallits/
 
 # Otros archivos comunes
 *.log
