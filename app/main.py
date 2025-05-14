@@ -6,6 +6,11 @@ from app.services.findPosts import search_reddit_praw
 from app.services.sortTitles import filter_titles
 from app.services.analyzeSentiments import analyze_csv
 
+from fastapi.responses import JSONResponse
+import os
+import json
+import urllib.parse
+
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -36,3 +41,31 @@ def search_and_filter(keyword: str):
     analyze_csv(csv_name, keyword)
 
     return {"message": f"🔎 Cerca completada per '{keyword}'. Resultat CSV: {csv_name}. JSON result generated"}
+
+
+# Define GET route /search/{keyword} to retrieve search results
+@app.get("/search/{keyword}")
+def get_search_results(keyword: str):
+    # Decode URL encoding and replace spaces
+    decoded_keyword = urllib.parse.unquote(keyword)
+    sanitized_keyword = decoded_keyword.replace(" ", "_")
+
+    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "ResultadosFiltered"))
+
+    matching_files = [
+        f for f in os.listdir(base_path)
+        if f.startswith(f"reddit_praw_{sanitized_keyword}") and f.endswith("_analyzed.json")
+    ]
+
+    if not matching_files:
+        return JSONResponse(status_code=404, content={"error": f"No results found for '{keyword}'."})
+
+    matching_files.sort(reverse=True)
+    filepath = os.path.join(base_path, matching_files[0])
+
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return JSONResponse(content=data)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": f"Failed to load results: {str(e)}"})

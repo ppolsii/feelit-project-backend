@@ -10,7 +10,7 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 from openai.error import RateLimitError, APIError, Timeout
 import re
-import reanalyze_failed_batches
+# import reanalyze_failed_batches
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -198,8 +198,10 @@ def combine_results(resultats):
 
 # Main function to analyze a CSV file
 def analyze_csv(csv_name, topic):
-    path = os.path.join(BASE_DIR, "data", "CSVfile", csv_name)
-    output_path = os.path.join(BASE_DIR, "data", "ResultadosFiltered", csv_name.replace(".csv", "_analyzed.json"))
+    path = os.path.join(BASE_DIR, "data", "CSVfile", os.path.basename(csv_name))
+
+    filename_only = os.path.basename(csv_name)
+    output_path = os.path.join(BASE_DIR, "data", "ResultadosFiltered", filename_only.replace(".csv", "_analyzed.json"))
 
     # Empty the failed batches file before starting
     with open(FALLITS_FILE, "w", encoding="utf-8") as f:
