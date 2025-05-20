@@ -13,7 +13,7 @@ def search_reddit_praw(keyword):
 
     #  Debug check: ensure all credentials are present
     if not client_id or not client_secret or not user_agent:
-        raise RuntimeError("❌ Missing reddit token variables ( REDDIT_CLIENT_ID, ...) - not found. Please check your environment!")
+        raise RuntimeError("Missing reddit token variables ( REDDIT_CLIENT_ID, ...) - not found. Please check your environment!")
 
     # Initialize Reddit API client
     reddit = praw.Reddit(
@@ -23,17 +23,18 @@ def search_reddit_praw(keyword):
     )
 
     # Define project root path (2 levels up from this file)
-    main_dir = Path(__file__).resolve().parents[2]  # Two levels up from this file
+    main_dir = Path(__file__).resolve().parents[2] 
 
     # Folder to store generated CSVs (.csv)
     folder = os.path.join(main_dir, 'data', 'CSVfile')
 
-    # Create sanitized CSV filename using keyword and current date
+    # Create CSV filename using keyword and current date
     sanitized_keyword = keyword.replace(" ", "_")
     date = dt.date.today()
     csv_filename = os.path.join(folder, f'reddit_praw_{sanitized_keyword}_{date}.csv')
 
     os.makedirs(folder, exist_ok=True)
+
 
     # Open CSV file for writing
     with open(csv_filename, mode='w', newline='', encoding='utf-8') as csv_file:
@@ -48,7 +49,7 @@ def search_reddit_praw(keyword):
             'Number of Replies'
         ])
 
-        print(f"\n🔍 Searching Reddit for: {keyword} (PRAW)\n")
+        print(f"\nSearching Reddit for: {keyword} (PRAW)\n")
         subreddit = reddit.subreddit('all')
 
         num = 1
@@ -60,6 +61,7 @@ def search_reddit_praw(keyword):
             if submission.num_comments == 0:
                 continue
 
+            # Iteration over comments in the post
             submission.comments.replace_more(limit=0)
             for comment in submission.comments.list():
                 comment_text = comment.body.strip().replace('\n', ' ')
@@ -79,5 +81,5 @@ def search_reddit_praw(keyword):
                     ])
                     num += 1
 
-    print(f"\n✅ Results saved in '{csv_filename}'")
+    print(f"\ Results saved in '{csv_filename}'")
     return csv_filename

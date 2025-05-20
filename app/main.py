@@ -28,9 +28,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define GET route /api/search to handle Reddit search and title filtering
+# Define GET route /api/search to handle Reddit search
 @app.get("/api/search")
-def search_and_filter(keyword: str):
+def search_and_filter(keyword: str): #Keyword is got from the frontend
     # Step 1: Search Reddit and save results to CSV
     csv_name = search_reddit_praw(keyword)
 
@@ -40,7 +40,7 @@ def search_and_filter(keyword: str):
     # Step 3: Analyze sentiments using a pre-trained model
     analyze_csv(csv_name, keyword)
 
-    return {"message": f"🔎 Cerca completada per '{keyword}'. Resultat CSV: {csv_name}. JSON result generated"}
+    return {"message": f"Searcj completed for '{keyword}'. CSV results: {csv_name}. JSON result generated"}
 
 
 # Define GET route /search/{keyword} to retrieve search results
@@ -50,16 +50,20 @@ def get_search_results(keyword: str):
     decoded_keyword = urllib.parse.unquote(keyword)
     sanitized_keyword = decoded_keyword.replace(" ", "_")
 
+    # Path to where the results are stored
     base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "ResultadosFiltered"))
 
+    # Check if the .json file for the given keyword exists
     matching_files = [
         f for f in os.listdir(base_path)
         if f.startswith(f"reddit_praw_{sanitized_keyword}") and f.endswith("_analyzed.json")
     ]
 
+    # If no matching files are found, return a 404 error
     if not matching_files:
         return JSONResponse(status_code=404, content={"error": f"No results found for '{keyword}'."})
 
+    # Selected the most recent file, in casa of multiple matches
     matching_files.sort(reverse=True)
     filepath = os.path.join(base_path, matching_files[0])
 
@@ -69,3 +73,4 @@ def get_search_results(keyword: str):
         return JSONResponse(content=data)
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": f"Failed to load results: {str(e)}"})
+    

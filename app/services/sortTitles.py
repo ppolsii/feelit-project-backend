@@ -2,33 +2,31 @@ from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassific
 import torch
 import pandas as pd
 from pathlib import Path
-import os
 
-# Step 1: Define directory where this script is located
-this_dir = Path(__file__).resolve().parent
-
-# Step 2: Build full path to the saved model directory
-model_path = (this_dir.parent / "models" / "model_output").resolve()
-
-# Step 3: Load pre-trained model and tokenizer from local directory
-model = DistilBertForSequenceClassification.from_pretrained(
-    model_path, local_files_only=True
-)
-tokenizer = DistilBertTokenizerFast.from_pretrained(
-    'distilbert-base-uncased', local_files_only=True
-)
-
-# Step 4: Set the model to evaluation mode (for prediction only).
-# This disables things like dropout and ensures consistent results.
-model.eval() 
-
-# Function to classify and filter titles from a CSV file
+# ==== Main function to classify and filter titles from a CSV file====
+# Filters a CSV file by classifying post titles using DistilBERT 
+# and keeps only the ones predicted as relevant (label 1).
+# Overwrites the original CSV with the filtered results.
 def filter_titles(csv_path: str):
-    """
-    Filters a CSV file by classifying post titles using DistilBERT,
-    and keeps only the ones predicted as relevant (label 1).
-    Overwrites the original CSV with the filtered results.
-    """
+
+    # Define directory where this script is located
+    this_dir = Path(__file__).resolve().parent
+
+    # Full path to the saved model directory
+    model_path = (this_dir.parent / "models" / "model_output").resolve()
+
+    # Load pre-trained model and tokenizer from local directory
+    model = DistilBertForSequenceClassification.from_pretrained(
+        model_path, local_files_only=True
+    )
+    tokenizer = DistilBertTokenizerFast.from_pretrained(
+        'distilbert-base-uncased', local_files_only=True
+    )
+
+    # Set the model to evaluation mode (for prediction only)
+    # This disables things like dropout and ensures consistent results
+    model.eval() 
+    
     input_csv = Path(csv_path).resolve()
     print("sortTitles_service.py → input_csv:", input_csv)
 
@@ -57,4 +55,4 @@ def filter_titles(csv_path: str):
 
     # Overwrite the original CSV with filtered results
     df_filtered.to_csv(input_csv, index=False)
-    print(f"\n✅ Overwritten CSV with {len(df_filtered)} entries: {input_csv}")
+    print(f"\nOverwritten CSV with {len(df_filtered)} entries: {input_csv}")

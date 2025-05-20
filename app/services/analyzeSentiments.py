@@ -25,9 +25,9 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 # Create a directory for failed batches if it doesn't exist
 # Note: Its implemented but not used, due to the time it takes to reanalyze the batches --> Not worth it.
-FALLITS_PATH = os.path.join(BASE_DIR, "data", "LotesFallits")
-os.makedirs(FALLITS_PATH, exist_ok=True)
-FALLITS_FILE = os.path.join(FALLITS_PATH, "batches_fallits.jsonl")
+FAILED_PATH = os.path.join(BASE_DIR, "data", "LotesFallits")
+os.makedirs(FAILED_PATH, exist_ok=True)
+FALLITS_FILE = os.path.join(FAILED_PATH, "batches_fallits.jsonl")
 
 # Function to load comments from a CSV file
 def load_comments(csv_path):
@@ -63,7 +63,8 @@ def divice_by_barches(comentaris):
 
 import re
 
-# Analyze a single batch of comments using OpenAI API
+
+# ==== Main function to analyze a single batch of comments using OpenAI API ====
 def analitzar_batch(batch, topic):
     # Build the prompt with the topic and comments
     texts = [c["text"] for c in batch]
@@ -73,6 +74,7 @@ Analyze the following Reddit comments about the topic \"{topic}\":
 1. Classify each comment as 'positiu', 'negatiu', or 'neutre'.
 2. Provide standalone, self-contained summaries of positive and negative opinions (avoid vague replies, partial phrases, or references to other comments).
 3. Include the most relevant comments with high votes or replies.
+4. Translate opinions and comentaris to English.
 
 Expected JSON format:
 {{
@@ -97,12 +99,12 @@ Comments:
 
     try:
         # Send the request to the OpenAI API
-        resposta = openai.ChatCompletion.create(
+        answer = openai.ChatCompletion.create(
             model=MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
         )
-        content = resposta.choices[0].message.content
+        content = answer.choices[0].message.content
 
         # Fix broken escape sequences
         content = re.sub(r'\\(?![nrt"\\/bfu])', r'\\\\', content)
@@ -113,13 +115,13 @@ Comments:
 
         # Handle invalid JSON responses
         except json.JSONDecodeError as e:
-            print("❌ JSON invàlid rebut (primeres línies):")
+            print("JSON recived is not valid (first lines):")
             print(content[:1000])  # Limit output to 1000 chars for debugging
-            print("🔍 Error:", e)
+            print("Error:", e)
 
             # If response looks incomplete or truncated, check for unclosed braces
             if not content.strip().endswith("}") or content.count("{") > content.count("}"):
-                print("⛔️ Resposta probablement truncada. Lot guardat a fitxer.")
+                print("Answer probably truncated. Batch saved to file.")
 
             # Save failed batch for later reanalysis
             with open(FALLITS_FILE, "a", encoding="utf-8") as f:
@@ -130,7 +132,7 @@ Comments:
 
     except Exception as e:
         # Handle general errors
-        print("⚠️ Error greu en batch:", e)
+        print("Important error on batch:", e)
 
         # Save the failed batch for later reanalysis
         with open(FALLITS_FILE, "a", encoding="utf-8") as f:
@@ -147,15 +149,15 @@ def process_lot_secure(batch_args, max_reintents=3):
         try:
             return analitzar_batch(batch, topic)
         except (RateLimitError, APIError, Timeout) as e:
-            print(f"⚠️ Error en lot (intent {intent}): {e}")
+            print(f"Faile on batch (try {intent}): {e}")
             time.sleep(3 * intent)  # Wait longer each retry
         except Exception as e:
-            print(f"❌ Error inesperat: {e}")
+            print(f"Unexpected error on batch: {e}")
             break
     return None
 
 # Summarize opinions into a list of most common ones
-def resumir_opinions(opinions_list, max_opinions=10):
+def summarize_opinions(opinions_list, max_opinions=10):
     counts = Counter(opinions_list)
     ordenades = [op for op, _ in counts.most_common(max_opinions)]
     return ordenades
@@ -173,31 +175,44 @@ def select_comments(comentaris, sentiment, min_count=3, max_count=5):
 
 # Combine multiple batch results into a final result
 def combine_results(resultats):
+    # Final result structure
     final = {
         "sentiments": {"positiu": 0, "negatiu": 0, "neutre": 0},
         "opinions": {"positives": [], "negatives": []},
         "comentaris": []
     }
+
+    # Iterate for each result of process_lot_secure()
     for r in resultats:
-        if not r:
+        if not r: # Skip if the batch failed
             continue
         for k in final["sentiments"]:
+            # Add the sentiments from the batch to the final result
             final["sentiments"][k] += r["sentiments"].get(k, 0)
+        
+        # Add the opinions from the batch to the final result
         final["opinions"]["positives"].extend(r["opinions"].get("positives", []))
         final["opinions"]["negatives"].extend(r["opinions"].get("negatives", []))
+
+        # Add the comments from the batch to the final result
         final["comentaris"].extend(r["comentaris"])
 
-    final["opinions"]["positives"] = resumir_opinions(final["opinions"]["positives"], 10)
-    final["opinions"]["negatives"] = resumir_opinions(final["opinions"]["negatives"], 10)
+    # Summarize opinions and select top comments
+    final["opinions"]["positives"] = summarize_opinions(final["opinions"]["positives"], 10)
+    final["opinions"]["negatives"] = summarize_opinions(final["opinions"]["negatives"], 10)
 
+    # Select top comments for positive and negative sentiments
     top_positius = select_comments(final["comentaris"], "positiu", 3, 5)
     top_negatius = select_comments(final["comentaris"], "negatiu", 3, 5)
+
+    # Remove the selected comments from the main list
     final["comentaris"] = top_positius + top_negatius
 
     return final
 
 # Main function to analyze a CSV file
 def analyze_csv(csv_name, topic):
+    # Define the path to the CSV file
     path = os.path.join(BASE_DIR, "data", "CSVfile", os.path.basename(csv_name))
 
     filename_only = os.path.basename(csv_name)
@@ -207,21 +222,29 @@ def analyze_csv(csv_name, topic):
     with open(FALLITS_FILE, "w", encoding="utf-8") as f:
         pass
 
+    # Load comments from the CSV file
     comentaris = load_comments(path)
+
+    # Check if there are comments to analyze
     batches = divice_by_barches(comentaris)
 
-    print(f"📄 Loaded {len(comentaris)} comments | {len(batches)} batches")
+    print(f"Loaded {len(comentaris)} comments | {len(batches)} batches")
 
+    # Parallelize the analysis of batches
     args = [(b, topic) for b in batches]
+
+    # Use ThreadPoolExecutor to process batches in parallel
     with ThreadPoolExecutor(max_workers=20) as executor:
         resultats = list(executor.map(process_lot_secure, args))
 
+    # Combine results from all batches
     resultat_final = combine_results(resultats)
 
+    # Save the final result to a JSON file
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(resultat_final, f, ensure_ascii=False, indent=2)
 
-    print(f"✅ Final JSON saved to: {output_path}")
+    print(f"Final JSON saved to: {output_path}")
     
     # Comment if you want to keep the failed batches for reanalysis
     return resultat_final
@@ -230,7 +253,7 @@ def analyze_csv(csv_name, topic):
     # Note: Currently disabled because reanalyzing is slow and often not necessary.
     '''
     if os.path.exists(FALLITS_FILE) and os.path.getsize(FALLITS_FILE) > 0:
-        print("🔁 Lots fallits detectats. Reanalitzant...")
+        print("Lots fallits detectats. Reanalitzant...")
         reanalyze_failed_batches.reanalyze_batches()
 
         # Si tenim un fitxer amb resultats corregits, combinem-ho tot
@@ -246,7 +269,7 @@ def analyze_csv(csv_name, topic):
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(resultat_final, f, ensure_ascii=False, indent=2)
 
-            print(f"✅ JSON final actualitzat amb lots reanalitzats: {output_path}")
+            print(f"JSON final actualitzat amb lots reanalitzats: {output_path}")
     '''
 
 # Main test block (disabled to use as a library)
