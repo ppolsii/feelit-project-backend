@@ -21,20 +21,20 @@ def load_failed_batches():
         try:
             lots.append(json.loads(line))
         except Exception as e:
-            print("❌ Error carregant una línia:", e)
+            print("Error carregant una línia:", e)
     return lots
 
 # Reanalyze failed batches and filter only those that succeed
 def reanalyze_batches():
     lots = load_failed_batches()
     if not lots:
-        print("✅ No hi ha lots pendents.")
+        print("No hi ha lots pendents.")
         return
 
     resultats_bons = []
     lots_restants = []
 
-    print(f"🔁 Reanalitzant {len(lots)} lots fallits...")
+    print(f"Reanalitzant {len(lots)} lots fallits...")
 
     for i, lot_info in enumerate(lots):
         topic = lot_info["topic"]
@@ -65,7 +65,7 @@ def reanalyze_batches():
     if lots_restants:
         print(f"⚠️ {len(lots_restants)} lots encara fallen i s’han tornat a guardar.")
     else:
-        print("🎉 Tots els lots s’han reanalitzat correctament!")
+        print("Tots els lots s’han reanalitzat correctament!")
 
 if __name__ == "__main__":
     reanalyze_batches()
