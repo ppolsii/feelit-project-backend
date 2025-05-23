@@ -8,13 +8,17 @@ from dotenv import load_dotenv
 from collections import Counter
 import random
 from concurrent.futures import ThreadPoolExecutor
-from openai.error import RateLimitError, APIError, Timeout
+from openai import OpenAIError
 import re
+from openai import OpenAI
 # import reanalyze_failed_batches
 
 # Load environment variables from the .env file
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# openai.api_key = os.getenv("OPENAI_API_KEY")
+# print("🔑 Clau API carregada:", openai.api_key is not None)
+
 MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
 MAX_TOKENS = 1800
 ENCODING = tiktoken.encoding_for_model(MODEL)
@@ -99,12 +103,15 @@ Comments:
 
     try:
         # Send the request to the OpenAI API
-        answer = openai.ChatCompletion.create(
+        client = openai.OpenAI()  # Create an OpenAI client instance using the API key
+
+        response = client.chat.completions.create(
             model=MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
         )
-        content = answer.choices[0].message.content
+
+        content = response.choices[0].message.content
 
         # Fix broken escape sequences
         content = re.sub(r'\\(?![nrt"\\/bfu])', r'\\\\', content)
@@ -148,7 +155,7 @@ def process_lot_secure(batch_args, max_reintents=3):
     for intent in range(1, max_reintents + 1):
         try:
             return analitzar_batch(batch, topic)
-        except (RateLimitError, APIError, Timeout) as e:
+        except OpenAIError as e:
             print(f"Faile on batch (try {intent}): {e}")
             time.sleep(3 * intent)  # Wait longer each retry
         except Exception as e:
@@ -275,7 +282,7 @@ def analyze_csv(csv_name, topic):
 # Main test block (disabled to use as a library)
 '''
 if __name__ == "__main__":
-    example_csv = "reddit_praw_malta_2025-04-15.csv"
+    example_csv = "reddit_praw_Trip_to_Malta_2025-05-22.csv"
     topic = "Malta"
     analyze_csv(example_csv, topic)
 '''

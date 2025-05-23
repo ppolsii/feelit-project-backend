@@ -81,5 +81,5 @@ def search_reddit_praw(keyword):
                     ])
                     num += 1
 
-    print(f"\ Results saved in '{csv_filename}'")
+    print(f"\nResults saved in '{csv_filename}'")
     return csv_filename
