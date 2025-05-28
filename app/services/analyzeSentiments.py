@@ -29,9 +29,12 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 # Create a directory for failed batches if it doesn't exist
 # Note: Its implemented but not used, due to the time it takes to reanalyze the batches --> Not worth it.
+'''
+if not os.path.exists(os.path.join(BASE_DIR, "data", "LotesFallits")):
 FAILED_PATH = os.path.join(BASE_DIR, "data", "LotesFallits")
 os.makedirs(FAILED_PATH, exist_ok=True)
 FALLITS_FILE = os.path.join(FAILED_PATH, "batches_fallits.jsonl")
+'''
 
 # Function to load comments from a CSV file
 def load_comments(csv_path):
@@ -65,21 +68,23 @@ def divice_by_barches(comentaris):
         batches.append(lot)
     return batches
 
-import re
-
-
+# ==============================================================================
 # ==== Main function to analyze a single batch of comments using OpenAI API ====
+# ==============================================================================
 def analitzar_batch(batch, topic):
     # Build the prompt with the topic and comments
     texts = [c["text"] for c in batch]
     prompt = f"""
-Analyze the following Reddit comments about the topic \"{topic}\":
+Analyze the following Reddit comments and ONLY include those clearly related to the topic: "{topic}".
+Note: The classification of tasks 1, 2 and 3 are meant to show opinions related to the tpic.
 
-1. Classify each comment as 'positiu', 'negatiu', or 'neutre'.
-2. Provide standalone, self-contained summaries of positive and negative opinions (avoid vague replies, partial phrases, or references to other comments).
-3. Include the most relevant comments with high votes or replies.
-4. Translate opinions and comentaris to English.
+Tasks:
+1. Classify ALL comments as 'positiu', 'negatiu', or 'neutre'.
+2. Sumarize the most common positive and negative opinions expressed in the comments. The opinionst must be short phrases and related to the searched topic.
+3. Select the top 3-5 comments for both positive and negative sentiments, based on the number of votes and replies. The comments must be related to the topic and express some kind of opinion about it.
+4. Translate all comements and opinions to English.
 
+Ensure valid JSON and escape special characters properly.
 Expected JSON format:
 {{
   "sentiments": {{"positiu": 0, "negatiu": 0, "neutre": 0}},
@@ -131,9 +136,12 @@ Comments:
                 print("Answer probably truncated. Batch saved to file.")
 
             # Save failed batch for later reanalysis
+            # Descoment this if you want to keep the failed batches for reanalysis
+            '''
             with open(FALLITS_FILE, "a", encoding="utf-8") as f:
                 json.dump({"topic": topic, "batch": batch}, f, ensure_ascii=False)
                 f.write("\n")
+            '''
 
             return None
 
@@ -142,14 +150,17 @@ Comments:
         print("Important error on batch:", e)
 
         # Save the failed batch for later reanalysis
+        # Descoment this if you want to keep the failed batches for reanalysis
+        '''
         with open(FALLITS_FILE, "a", encoding="utf-8") as f:
             json.dump({"topic": topic, "batch": batch}, f, ensure_ascii=False)
             f.write("\n")
+        '''
 
         return None
 
 
-# Securely process a batch with retry attempts
+# Process a batch with retry attempts
 def process_lot_secure(batch_args, max_reintents=3):
     batch, topic = batch_args
     for intent in range(1, max_reintents + 1):
@@ -171,7 +182,7 @@ def summarize_opinions(opinions_list, max_opinions=10):
 
 # Select top comments based on votes and replies
 def select_comments(comentaris, sentiment, min_count=3, max_count=5):
-    filtrats = [c for c in comentaris if c["sentiment"] == sentiment]
+    filtrats = [c for c in comentaris if "sentiment" in c and c["sentiment"] == sentiment]
     ordenats = sorted(filtrats, key=lambda c: (c["vots"], c["respostes"]), reverse=True)
     seleccionats = ordenats[:max_count]
     if len(seleccionats) < min_count:
@@ -226,8 +237,11 @@ def analyze_csv(csv_name, topic):
     output_path = os.path.join(BASE_DIR, "data", "ResultadosFiltered", filename_only.replace(".csv", "_analyzed.json"))
 
     # Empty the failed batches file before starting
+    # Descoment this if you want to keep the failed batches for reanalysis
+    '''
     with open(FALLITS_FILE, "w", encoding="utf-8") as f:
         pass
+    '''
 
     # Load comments from the CSV file
     comentaris = load_comments(path)
@@ -258,6 +272,7 @@ def analyze_csv(csv_name, topic):
 
     # Optional: Reanalyze failed batches and merge corrected results
     # Note: Currently disabled because reanalyzing is slow and often not necessary.
+    # Descoment this if you want to keep the failed batches for reanalysis
     '''
     if os.path.exists(FALLITS_FILE) and os.path.getsize(FALLITS_FILE) > 0:
         print("Lots fallits detectats. Reanalitzant...")
