@@ -1,4 +1,4 @@
-# 🧠 FeelIt - Opinion Analysis on Reddit
+# FeelIt - Opinion Analysis on Reddit
 
 **FeelIt** is a web application developed as a Final Degree Project to analyze opinions on any topic collected from Reddit, presenting a summarized and clear view through sentiment analysis and highlighted comments.
 
@@ -11,7 +11,7 @@ It uses FastAPI, PRAW (Reddit API), and a fine-tuned DistilBERT model to extract
 
 ---
 
-## 🧱 Project Structure
+## Project Structure
 
 /Backend/
 │
@@ -51,7 +51,7 @@ It uses FastAPI, PRAW (Reddit API), and a fine-tuned DistilBERT model to extract
 This project requires a pre-trained model (~1.74 GB) to work properly.  
 The model is **not included in this repository** due to its size.
 
-📦 **Download the model here**: [https://drive.google.com/drive/folders/11-DXYhMhrijQPiZU600u68px3JMKUmTb?usp=drive_link]
+**Download the model here**: [https://drive.google.com/drive/folders/11-DXYhMhrijQPiZU600u68px3JMKUmTb?usp=drive_link]
 
 After downloading, place the model inside the project folder as follows, it should look like this:
 ```
@@ -63,7 +63,7 @@ Backend/
 
 ---
 
- ## 🧠 How It Works
+ ## How It Works
 
 1. A user sends a search keyword to the FastAPI backend.
 
@@ -126,13 +126,13 @@ To train and test the classifier:
 
 ---
 
-## 📦 Requirements
+## Requirements
 
 All required packages are listed in requirements.txt.
 
 ---
 
-## ✨ Developed by
+## Developed by
 
 **Pol González Casals**  
 Universitat Autònoma de Barcelona (2025)  
