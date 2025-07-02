@@ -20,7 +20,7 @@ def filter_titles(csv_path: str):
         model_path, local_files_only=True
     )
     tokenizer = DistilBertTokenizerFast.from_pretrained(
-        'distilbert-base-uncased', local_files_only=True
+        model_path, local_files_only=True
     )
 
     # Set the model to evaluation mode (for prediction only)

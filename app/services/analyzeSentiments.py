@@ -80,7 +80,7 @@ Note: The classification of tasks 1, 2 and 3 are meant to show opinions related 
 
 Tasks:
 1. Classify ALL comments as 'positiu', 'negatiu', or 'neutre'.
-2. Sumarize the most common positive and negative opinions expressed in the comments. The opinionst must be short phrases and related to the searched topic.
+2. Summarize the 5 most common positive and 5 most common negative opinions expressed in the comments. The opinions must be short phrases and clearly related to the searched topic.
 3. Select the top 3-5 comments for both positive and negative sentiments, based on the number of votes and replies. The comments must be related to the topic and express some kind of opinion about it.
 4. Translate all comements and opinions to English.
 
@@ -216,8 +216,8 @@ def combine_results(resultats):
         final["comentaris"].extend(r["comentaris"])
 
     # Summarize opinions and select top comments
-    final["opinions"]["positives"] = summarize_opinions(final["opinions"]["positives"], 10)
-    final["opinions"]["negatives"] = summarize_opinions(final["opinions"]["negatives"], 10)
+    final["opinions"]["positives"] = summarize_opinions(final["opinions"]["positives"], 5)
+    final["opinions"]["negatives"] = summarize_opinions(final["opinions"]["negatives"], 5)
 
     # Select top comments for positive and negative sentiments
     top_positius = select_comments(final["comentaris"], "positiu", 3, 5)
